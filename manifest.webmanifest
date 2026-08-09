@@ -1,0 +1,9 @@
+{
+  "name": "Montbaby Library",
+  "short_name": "Montbaby",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f1e7",
+  "theme_color": "#f7f1e7",
+  "description": "Digital storybook library by Montbaby"
+}
