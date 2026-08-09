@@ -1,0 +1,12 @@
+{
+  "name":"Montbaby Library",
+  "short_name":"Montbaby",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#f6efe3",
+  "theme_color":"#f6efe3",
+  "description":"Digital storybook library by Montbaby",
+  "icons":[
+    {"src":"assets/brand/logo.png","sizes":"512x512","type":"image/png","purpose":"any"}
+  ]
+}

@@ -1,0 +1,39 @@
+const mataPages = [
+  'assets/books/mata/01-cover.png','assets/books/mata/02.png','assets/books/mata/03.png','assets/books/mata/04.png',
+  'assets/books/mata/05.png','assets/books/mata/06.png','assets/books/mata/07.png','assets/books/mata/08-back.png'
+];
+let currentPage = 0;
+const homeView = document.getElementById('homeView');
+const readerView = document.getElementById('readerView');
+const pageImage = document.getElementById('pageImage');
+const pageCounter = document.getElementById('pageCounter');
+const pageSlider = document.getElementById('pageSlider');
+const bookFrame = document.getElementById('bookFrame');
+const modal = document.getElementById('modal');
+
+function openBook(book){ if(book!=='mata') return; currentPage=Number(localStorage.getItem('montbaby-mata-page')||0); renderPage(); homeView.hidden=true; readerView.hidden=false; document.body.style.overflow='hidden'; }
+function closeReader(){ readerView.hidden=true; homeView.hidden=false; document.body.style.overflow=''; }
+function showHome(){ if(!readerView.hidden) closeReader(); window.scrollTo({top:0,behavior:'smooth'}); }
+function renderPage(direction){
+  pageImage.src=mataPages[currentPage]; pageCounter.textContent=`${currentPage+1} / ${mataPages.length}`; pageSlider.value=currentPage+1;
+  localStorage.setItem('montbaby-mata-page',currentPage);
+  bookFrame.classList.remove('turn-next','turn-prev'); void bookFrame.offsetWidth; if(direction) bookFrame.classList.add(direction==='next'?'turn-next':'turn-prev');
+}
+function nextPage(){ if(currentPage<mataPages.length-1){currentPage++;renderPage('next')} }
+function prevPage(){ if(currentPage>0){currentPage--;renderPage('prev')} }
+pageSlider.addEventListener('input',e=>{const next=Number(e.target.value)-1;const dir=next>currentPage?'next':'prev';currentPage=next;renderPage(dir)});
+let sx=0,sy=0;
+const stage=document.getElementById('readerStage');
+stage.addEventListener('touchstart',e=>{sx=e.changedTouches[0].clientX;sy=e.changedTouches[0].clientY},{passive:true});
+stage.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)){dx<0?nextPage():prevPage()}},{passive:true});
+document.addEventListener('keydown',e=>{if(readerView.hidden)return;if(e.key==='ArrowRight')nextPage();if(e.key==='ArrowLeft')prevPage();if(e.key==='Escape')closeReader()});
+function notUploaded(name){ openModal('☁',name,'Buku ini termasuk dalam Siri 5 Deria percuma. Muat naik semua halaman buku ini ke projek untuk mengaktifkan reader.'); }
+function showPremium(name){ openModal('🔒',name,'Koleksi ini ialah kandungan premium. Sistem pembayaran dan akses pelanggan boleh disambungkan selepas versi demo ini siap.'); }
+function openModal(icon,title,text){document.getElementById('modalIcon').textContent=icon;document.getElementById('modalTitle').textContent=title;document.getElementById('modalText').textContent=text;modal.hidden=false}
+function closeModal(){modal.hidden=true}
+modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+async function toggleFullscreen(){const el=document.getElementById('readerView');try{if(!document.fullscreenElement) await el.requestFullscreen(); else await document.exitFullscreen()}catch(_){} }
+let deferredPrompt;const installBtn=document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;installBtn.hidden=false});
+installBtn.addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;installBtn.hidden=true});
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
